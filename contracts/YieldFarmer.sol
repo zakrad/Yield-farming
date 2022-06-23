@@ -1,4 +1,4 @@
-pragma solidity 0.8.8;
+pragma solidity >=0.4.16 <0.9.0;
 pragma experimental ABIEncoderV2;
 
 import'@studydefi/money-legos/dydx/contracs/DydxFlashloanBase.sol';
