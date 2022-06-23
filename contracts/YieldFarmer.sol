@@ -4,6 +4,7 @@ pragma experimental ABIEncoderV2;
 import'@studydefi/money-legos/dydx/contracs/DydxFlashloanBase.sol';
 import '@studydefi/money-legos/dydx/contracts/ICallee.sol';
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import './Compound.sol';
 
 contract YieldFarmer is ICallee, DydxFlashloanBase {
     enum Direction {
@@ -23,6 +24,17 @@ contract YieldFarmer is ICallee, DydxFlashloanBase {
     constructor() public {
         owner = msg.sender;
     }
+
+    function openPosition(
+        address _solo,
+        address _token,
+        address _cToken,
+        uint _amountProvided,
+        uint _amountBorrowed,
+    ) external {
+        require(msg.sender == owner, 'only owner');
+        _initiateFlashloan(_solo, _token, _cToken, Direction.Deposit, _amountProvided - 2, _amountBorrowed);
+    }
     
     function callFunction(
         address sender,
@@ -32,6 +44,14 @@ contract YieldFarmer is ICallee, DydxFlashloanBase {
     public
     {
     Operation memory operation = abi.encode(data, (Operation));
+
+    if (operation.direction == Direction.Deposit) {
+        supply(operation.cToken, operation.amountProvided + operationBorrowed);
+        enterMarket(operation.cToken);
+        borrow(operation.cToken, operation.amountBorrowed)
+    } else {
+        
+    }
     }
 
     function _initiateFlashloan(
